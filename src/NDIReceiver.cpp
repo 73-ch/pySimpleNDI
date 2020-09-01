@@ -8,6 +8,10 @@ NDIReceiver::NDIReceiver() {
     if (!ndi_find) return;
 }
 
+NDIReceiver::~NDIReceiver() {
+    NDIlib_find_destroy(ndi_find);
+}
+
 void NDIReceiver::updateSources() {
     uint32_t no_sources = 0;
     const NDIlib_source_t* data;
@@ -33,12 +37,46 @@ std::vector<std::string> NDIReceiver::getSourceList() {
     return source_names;
 }
 
-NDIReceiver::~NDIReceiver() {
-    NDIlib_find_destroy(ndi_find);
+
+bool NDIReceiver::createNDIReceive() {
+    if (sources.empty()) {
+        std::cerr << "NDIReceiver:: sources is empty" << std::endl;
+        return false;
+    }
+
+    NDIlib_recv_create_v3_t recv_desc;
+
+    try {
+        recv_desc.source_to_connect_to = sources[sourceId];
+    } catch (std::out_of_range& oor) {
+        std::cerr << "NDIReceive:: source is not specified or wrong" << std::endl;
+        return false;
+    }
+
+    recv_desc.p_ndi_recv_name = "Example NDI Receiver";
+
+    ndi_receive = NDIlib_recv_create_v3(&recv_desc);
+
+    if (!ndi_receive) return false;
+
+
+    NDIlib_tally_t tally_state;
+    tally_state.on_program = true;
+    tally_state.on_preview = true;
+    NDIlib_recv_set_tally(ndi_receive, &tally_state);
+
+    return true;
 }
 
-void NDIReceiver::setSourceId(const unsigned int id) {
+bool NDIReceiver::setSource(const std::string& ndiName) {
+    for (int i = 0; i < sources.size(); ++i) {
+        if (sources[i].p_ndi_name == ndiName) {
+            sourceId = i;
+            return createNDIReceive();
+        }
+    }
 
+    return false;
 }
 
 void NDIReceiver::addHandler() {

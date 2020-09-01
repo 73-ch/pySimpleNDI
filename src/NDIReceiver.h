@@ -2,6 +2,7 @@
 #define SIMPLENDI_NDIRECEIVER_H
 
 #include <cstddef>
+#include <iostream>
 
 #include <Processing.NDI.Lib.h>
 #include <pybind11/pybind11.h>
@@ -11,17 +12,20 @@ namespace py = pybind11;
 
 class NDIReceiver {
     std::vector<NDIlib_source_t> sources;
+    int sourceId = -1;
 
     void updateSources();
+    bool createNDIReceive();
 
 public:
     NDIlib_find_instance_t ndi_find;
+    NDIlib_recv_instance_t ndi_receive;
 
     NDIReceiver();
     ~NDIReceiver();
 
     std::vector<std::string> getSourceList();
-    void setSourceId(unsigned int id);
+    bool setSource(const std::string& ndiName);
     void addHandler();
     py::array_t<unsigned char> getCurrentFrame() const;
 

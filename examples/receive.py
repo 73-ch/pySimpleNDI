@@ -8,3 +8,6 @@ if __name__ == '__main__':
 
     for s in source_list:
         print(s)
+
+    if len(source_list) > 0:
+        receiver.setSource(source_list[0])

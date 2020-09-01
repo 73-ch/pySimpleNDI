@@ -20,5 +20,6 @@ PYBIND11_MODULE(simplendi, m) {
 
     py::class_<NDIReceiver>(m, "NDIReceiver")
         .def(py::init<>())
-        .def("getSourceList", (std::vector<std::string> (NDIReceiver::*)()) &NDIReceiver::getSourceList);
+        .def("getSourceList", (std::vector<std::string> (NDIReceiver::*)()) &NDIReceiver::getSourceList)
+        .def("setSource", (bool (NDIReceiver::*)(const std::string)) &NDIReceiver::setSource);
 }

@@ -1,13 +1,13 @@
 #include <cstdio>
 #include <iostream>
+#include <string>
 
 #include "NDISender.h"
 
-NDISender::NDISender() {
+NDISender::NDISender(const std::string& name) {
     if (!NDIlib_initialize()) return;
 
-    ndi_send = NDIlib_send_create();
-    if (!ndi_send) return;
+    setName(name);
 
     ndi_frame.p_data = (uint8_t *) malloc(sizeof(uint8_t) * 256 * 256 * 4);
     ndi_frame.FourCC = NDIlib_FourCC_type_BGRX;
@@ -19,6 +19,21 @@ NDISender::~NDISender() {
     NDIlib_send_destroy(ndi_send);
 
     NDIlib_destroy();
+}
+
+void NDISender::initNDISend() {
+    if (isNDISendInitialized) NDIlib_send_destroy(ndi_send);
+
+    ndi_send = NDIlib_send_create(&ndi_desc);
+    if (!ndi_send) return;
+
+    isNDISendInitialized = true;
+}
+
+void NDISender::setName(const std::string& name) {
+    ndi_desc.p_ndi_name = name.c_str();
+
+    initNDISend();
 }
 
 bool NDISender::checkShape(const std::vector<ssize_t> &shape) {
@@ -39,7 +54,6 @@ bool NDISender::checkShape(const std::vector<ssize_t> &shape) {
 }
 
 void NDISender::copyFrame(const py::array_t<unsigned char> &frame) const {
-
     if (ndi_frame.FourCC == NDIlib_FourCC_type_BGRA) {
         memcpy((unsigned char *) ndi_frame.p_data, frame.data(), frame.size());
     } else if (ndi_frame.FourCC == NDIlib_FourCC_type_BGRX) {

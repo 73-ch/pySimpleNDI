@@ -3,7 +3,7 @@ import numpy as np
 from pysimplendi import NDISender
 
 if __name__ == "__main__":
-    sender = NDISender()
+    sender = NDISender("hello")
     image = cv2.imread("examples/img/test.png")
     image2 = cv2.imread("examples/img/test.png")
     b, g, r = cv2.split(image2)

@@ -12,6 +12,7 @@ PYBIND11_MODULE(simplendi, m) {
     m.doc() = "Python binding of NDI";
 
     py::class_<NDISender>(m, "NDISender")
-        .def(py::init<>())
-        .def("send", (void (NDISender::*)(py::array_t<unsigned char>)) &NDISender::send);
+        .def(py::init<const std::string&>())
+        .def("send", (void (NDISender::*)(py::array_t<unsigned char>)) &NDISender::send)
+        .def("setName", (void (NDISender::*)(std::string)) &NDISender::setName);
 }

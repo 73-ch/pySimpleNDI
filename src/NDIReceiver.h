@@ -10,7 +10,9 @@
 namespace py = pybind11;
 
 class NDIReceiver {
-    const NDIlib_source_t* sources;
+    std::vector<NDIlib_source_t> sources;
+
+    void updateSources();
 
 public:
     NDIlib_find_instance_t ndi_find;

@@ -8,24 +8,33 @@ NDIReceiver::NDIReceiver() {
     if (!ndi_find) return;
 }
 
-std::vector<std::string> NDIReceiver::getSourceList() {
+void NDIReceiver::updateSources() {
     uint32_t no_sources = 0;
-    while (!no_sources){
+    const NDIlib_source_t* data;
+    while (!no_sources) {
         NDIlib_find_wait_for_sources(ndi_find, 1000);
-        sources = NDIlib_find_get_current_sources(ndi_find, &no_sources);
+        data = NDIlib_find_get_current_sources(ndi_find, &no_sources);
     }
+
+    sources.resize(no_sources);
+
+    std::copy(data, data + no_sources, sources.begin());
+}
+
+std::vector<std::string> NDIReceiver::getSourceList() {
+    updateSources();
 
     std::vector<std::string> source_names;
 
-    for (size_t i = 0; i < no_sources; ++i) {
-        source_names.emplace_back(sources[i].p_ndi_name);
+    for (auto& s : sources) {
+        source_names.emplace_back(s.p_ndi_name);
     }
 
     return source_names;
 }
 
 NDIReceiver::~NDIReceiver() {
-
+    NDIlib_find_destroy(ndi_find);
 }
 
 void NDIReceiver::setSourceId(const unsigned int id) {

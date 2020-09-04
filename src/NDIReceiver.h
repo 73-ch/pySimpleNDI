@@ -11,10 +11,10 @@
 namespace py = pybind11;
 
 class NDIReceiver {
-    std::vector<NDIlib_source_t> sources;
+    std::vector<NDIlib_source_t> source_list;
     int sourceId = -1;
 
-    void updateSources();
+    void updateSourceList();
     bool createNDIReceive();
 
 public:

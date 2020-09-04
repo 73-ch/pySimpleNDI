@@ -12,7 +12,7 @@ NDIReceiver::~NDIReceiver() {
     NDIlib_find_destroy(ndi_find);
 }
 
-void NDIReceiver::updateSources() {
+void NDIReceiver::updateSourceList() {
     uint32_t no_sources = 0;
     const NDIlib_source_t* data;
     while (!no_sources) {
@@ -20,17 +20,17 @@ void NDIReceiver::updateSources() {
         data = NDIlib_find_get_current_sources(ndi_find, &no_sources);
     }
 
-    sources.resize(no_sources);
+    source_list.resize(no_sources);
 
-    std::copy(data, data + no_sources, sources.begin());
+    std::copy(data, data + no_sources, source_list.begin());
 }
 
 std::vector<std::string> NDIReceiver::getSourceList() {
-    updateSources();
+    updateSourceList();
 
     std::vector<std::string> source_names;
 
-    for (auto& s : sources) {
+    for (auto& s : source_list) {
         source_names.emplace_back(s.p_ndi_name);
     }
 
@@ -39,7 +39,7 @@ std::vector<std::string> NDIReceiver::getSourceList() {
 
 
 bool NDIReceiver::createNDIReceive() {
-    if (sources.empty()) {
+    if (source_list.empty()) {
         std::cerr << "NDIReceiver:: sources is empty" << std::endl;
         return false;
     }
@@ -47,7 +47,7 @@ bool NDIReceiver::createNDIReceive() {
     NDIlib_recv_create_v3_t recv_desc;
 
     try {
-        recv_desc.source_to_connect_to = sources[sourceId];
+        recv_desc.source_to_connect_to = source_list[sourceId];
     } catch (std::out_of_range& oor) {
         std::cerr << "NDIReceive:: source is not specified or wrong" << std::endl;
         return false;
@@ -69,8 +69,8 @@ bool NDIReceiver::createNDIReceive() {
 }
 
 bool NDIReceiver::setSource(const std::string& ndiName) {
-    for (int i = 0; i < sources.size(); ++i) {
-        if (sources[i].p_ndi_name == ndiName) {
+    for (int i = 0; i < source_list.size(); ++i) {
+        if (source_list[i].p_ndi_name == ndiName) {
             sourceId = i;
             return createNDIReceive();
         }

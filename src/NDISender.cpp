@@ -4,13 +4,14 @@
 
 #include "NDISender.h"
 
-NDISender::NDISender(const std::string& name) {
+NDISender::NDISender(const std::string &name) {
     if (!NDIlib_initialize()) return;
 
     setName(name);
 
     ndi_frame.p_data = (uint8_t *) malloc(sizeof(uint8_t) * 256 * 256 * 4);
-    ndi_frame.FourCC = NDIlib_FourCC_type_BGRX;
+    ndi_frame.FourCC = NDIlib_FourCC_type_BGRA;
+    ndi_frame.p_metadata = nullptr;
 }
 
 NDISender::~NDISender() {
@@ -24,13 +25,16 @@ NDISender::~NDISender() {
 void NDISender::initNDISend() {
     if (isNDISendInitialized) NDIlib_send_destroy(ndi_send);
 
+    ndi_desc.p_groups = NULL;
+    ndi_desc.clock_video = true;
+
     ndi_send = NDIlib_send_create(&ndi_desc);
     if (!ndi_send) return;
 
     isNDISendInitialized = true;
 }
 
-void NDISender::setName(const std::string& name) {
+void NDISender::setName(const std::string &name) {
     ndi_desc.p_ndi_name = name.c_str();
 
     initNDISend();
@@ -43,8 +47,10 @@ bool NDISender::checkShape(const std::vector<ssize_t> &shape) {
 
     if (shape[2] == 3) {
         ndi_frame.FourCC = NDIlib_FourCC_type_BGRX;
+        std::cout << "BGRX" << std::endl;
     } else if (shape[2] == 4) {
         ndi_frame.FourCC = NDIlib_FourCC_type_BGRA;
+        std::cout << "BGRA" << std::endl;
     } else {
         std::cerr << "NDISender:: source shape[2] must be 3 or 4." << std::endl;
         return false;
@@ -73,6 +79,8 @@ void NDISender::changeResolution(const int xres, const int yres) {
 
     ndi_frame.xres = xres;
     ndi_frame.yres = yres;
+    ndi_frame.line_stride_in_bytes = xres * 4;
+    ndi_frame.picture_aspect_ratio = (float)xres / (float)yres;
     buffer_size = xres * yres * 4;
 
     if ((tmp = (uint8_t *) realloc(ndi_frame.p_data, buffer_size)) != nullptr) {
@@ -89,5 +97,9 @@ void NDISender::send(const py::array_t<unsigned char> &frame) {
 
     copyFrame(frame);
 
-    NDIlib_send_send_video_v2(ndi_send, &ndi_frame);
+//    std::cout << (int) (ndi_frame.FourCC == NDIlib_FourCC_type_BGRX)
+//              << (int) (ndi_frame.FourCC == NDIlib_FourCC_type_BGRA)
+//              << (int) (ndi_frame.FourCC == NDIlib_FourCC_type_UYVY) << std::endl;
+
+    NDIlib_send_send_video_async_v2(ndi_send, &ndi_frame);
 }

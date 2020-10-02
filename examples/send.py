@@ -21,5 +21,5 @@ if __name__ == "__main__":
         if i > 15:
             sender.send(image)
         else:
-            sender.send(image2)
+            sender.send(image_rgba)
 

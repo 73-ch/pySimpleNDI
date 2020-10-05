@@ -21,6 +21,7 @@ class NDIReceiver {
     std::mutex mutex;
 
     py::array_t<unsigned char> result_array;
+    py::array_t<unsigned char> tmp_result_array;
 
     bool receiving = false;
 
@@ -28,6 +29,7 @@ class NDIReceiver {
     bool createNDIReceive();
     void startReceive();
     void stopReceive();
+    void receive();
 
 public:
     NDIlib_find_instance_t ndi_find;

@@ -95,7 +95,8 @@ void NDIReceiver::addHandler() {
 }
 
 py::array_t<unsigned char> NDIReceiver::getCurrentFrame() const {
-    return result_array;
+    auto cp_result = result_array;
+    return cp_result;
 }
 
 void NDIReceiver::startReceive() {
@@ -104,76 +105,77 @@ void NDIReceiver::startReceive() {
 
     receiveThread = std::thread([&] {
         while (receiving) {
-            NDIlib_video_frame_v2_t video_frame;
-            NDIlib_audio_frame_v2_t audio_frame;
-            NDIlib_metadata_frame_t metadata_frame;
+            receive();
+        }
+    });
+}
 
-            std::lock_guard<std::mutex> lock(mutex);
+void NDIReceiver::receive() {
+    NDIlib_video_frame_v2_t video_frame;
+    NDIlib_audio_frame_v2_t audio_frame;
+    NDIlib_metadata_frame_t metadata_frame;
 
-            switch (NDIlib_recv_capture_v2(ndi_receive, &video_frame, &audio_frame, &metadata_frame, 1000)) {
-                // No data
-                case NDIlib_frame_type_none:
-                    break;
+    std::lock_guard<std::mutex> lock(mutex);
 
-                    // Video data
-                case NDIlib_frame_type_video:
-                    video_frame.p_metadata = nullptr;
-                    result_array.resize(
-                            {video_frame.yres, video_frame.xres, FourCC2NumBytesPerPixel.at(video_frame.FourCC)});
+    switch (NDIlib_recv_capture_v2(ndi_receive, &video_frame, &audio_frame, &metadata_frame, 1000)) {
+            // Video data
+        case NDIlib_frame_type_video:
+            video_frame.p_metadata = nullptr;
+
+//                    std::cout << "four: " << FourCC2NumBytesPerPixel.at(video_frame.FourCC) << std::endl;
+//                    std::cout << "(" << video_frame.xres << "," << video_frame.yres << ")" << std::endl;
+
+            tmp_result_array.resize(
+                    {video_frame.yres, video_frame.xres, FourCC2NumBytesPerPixel.at(video_frame.FourCC)});
 //                    std::cout << result_array.shape(0) << "," << result_array.shape(1) << "," << result_array.shape(2)
 //                              << std::endl;
 //                    std::cout << video_frame.xres << "," << video_frame.yres << std::endl;
 //                    std::cout << result_array.size() / sizeof(unsigned char) << std::endl;
 
-                    std::cout << (int) (video_frame.FourCC == NDIlib_FourCC_type_BGRX)
-                              << (int) (video_frame.FourCC == NDIlib_FourCC_type_BGRA)
-                              << (int) (video_frame.FourCC == NDIlib_FourCC_type_UYVY) << std::endl;
+            std::cout << (int) (video_frame.FourCC == NDIlib_FourCC_type_BGRX)
+                      << (int) (video_frame.FourCC == NDIlib_FourCC_type_BGRA)
+                      << (int) (video_frame.FourCC == NDIlib_FourCC_type_UYVY) << std::endl;
 
-                    if (video_frame.FourCC == NDIlib_FourCC_type_UYVY) {
-                        Converter::convertUYVY2RGB((const unsigned char *) video_frame.p_data,
-                                                   result_array.mutable_data(),
-                                                   video_frame.xres, video_frame.yres,
-                                                   video_frame.line_stride_in_bytes);
-                    } else if (video_frame.FourCC == NDIlib_FourCC_type_BGRA) {
-                        std::cout << "RGBA" << std::endl;
-                        memcpy((unsigned char *) video_frame.p_data, result_array.data(), result_array.size());
-                    } else if (video_frame.FourCC == NDIlib_FourCC_type_BGRX) {
-                        // BGRの時のNDI video_frameからnumpy result_arrayへのデータのコピー
-                        std::cout << "RGB" << std::endl;
-                        auto frame = result_array.mutable_data();
-                        for (int i = 0; i < video_frame.yres; ++i) {
-                            for (int j = 0; j < video_frame.xres; ++j) {
-                                *frame++ = video_frame.p_data[(i * video_frame.xres + j) * 4];
-                                *frame++ = video_frame.p_data[(i * video_frame.xres + j) * 4 + 1];
-                                *frame++ = video_frame.p_data[(i * video_frame.xres + j) * 4 + 2];
-                            }
-                        }
+            if (video_frame.FourCC == NDIlib_FourCC_type_UYVY) {
+                Converter::convertUYVY2RGB((const unsigned char *) video_frame.p_data,
+                                           result_array.mutable_data(),
+                                           video_frame.xres, video_frame.yres,
+                                           video_frame.line_stride_in_bytes);
+            } else if (video_frame.FourCC == NDIlib_FourCC_type_BGRA) {
+//                        std::cout << "RGBA" << std::endl;
+                memcpy((unsigned char *)tmp_result_array.mutable_data(), video_frame.p_data, tmp_result_array.size());
+            } else if (video_frame.FourCC == NDIlib_FourCC_type_BGRX) {
+                // BGRの時のNDI video_frameからnumpy result_arrayへのデータのコピー
+//                        std::cout << "RGB" << std::endl;
+                auto frame = tmp_result_array.mutable_data();
+                for (int i = 0; i < video_frame.yres; ++i) {
+                    for (int j = 0; j < video_frame.xres; ++j) {
+                        *frame++ = video_frame.p_data[(i * video_frame.xres + j) * 4];
+                        *frame++ = video_frame.p_data[(i * video_frame.xres + j) * 4 + 1];
+                        *frame++ = video_frame.p_data[(i * video_frame.xres + j) * 4 + 2];
                     }
-
-                    NDIlib_recv_free_video_v2(ndi_receive, &video_frame);
-                    break;
-
-                    // Audio data
-                case NDIlib_frame_type_audio:
-                    NDIlib_recv_free_audio_v2(ndi_receive, &audio_frame);
-                    break;
-
-                    // Meta data
-                case NDIlib_frame_type_metadata:
-                    NDIlib_recv_free_metadata(ndi_receive, &metadata_frame);
-                    break;
-
-                    // There is a status change on the receiver (e.g. new web interface)
-                case NDIlib_frame_type_status_change:
-                    std::cout << "change type" << std::endl;
-                    break;
-
-                    // Everything else
-                default:
-                    break;
+                }
             }
-        }
-    });
+
+            NDIlib_recv_free_video_v2(ndi_receive, &video_frame);
+
+            std::swap(result_array, tmp_result_array);
+            break;
+
+            // Audio data
+        case NDIlib_frame_type_audio:
+            NDIlib_recv_free_audio_v2(ndi_receive, &audio_frame);
+            break;
+
+            // Meta data
+        case NDIlib_frame_type_metadata:
+            NDIlib_recv_free_metadata(ndi_receive, &metadata_frame);
+            break;
+
+            // Everything else
+        default:
+            break;
+    }
 }
 
 void NDIReceiver::stopReceive() {

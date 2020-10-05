@@ -26,8 +26,15 @@ if __name__ == '__main__':
         if len(frame) >= 3:
             # cv2.imwrite('output/' + str(counter) + '.png', frame)
             counter += 1
+            # display = np.copy(frame)
             cv2.imshow(window_name, frame)
+
+            if frame.shape[2] == 4:
+                r, g, b, a = cv2.split(frame)
+                s = np.sum(r)
+                print("sum", s)
+
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-
+        time.sleep(0.1)
     cv2.destroyWindow(window_name)

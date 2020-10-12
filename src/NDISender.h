@@ -12,7 +12,7 @@ class NDISender {
 
     bool checkShape(const std::vector <ssize_t> &shape);
     void copyFrame(const py::array_t<unsigned char> &frame) const;
-    void changeResolution(const int xres, const int yres);
+    void changeResolution(int xres, int yres);
     void initNDISend();
 
 public:

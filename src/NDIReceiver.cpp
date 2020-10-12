@@ -6,6 +6,9 @@ NDIReceiver::NDIReceiver() {
     NDIlib_find_create_t NDI_find_create_desc;
     ndi_find = NDIlib_find_create_v2(&NDI_find_create_desc);
     if (!ndi_find) return;
+
+    tmp_result_array = py::array_t<unsigned char>({780, 960, 4});
+    result_array = py::array_t<unsigned char>({780, 960, 4});
 }
 
 NDIReceiver::~NDIReceiver() {
@@ -118,7 +121,7 @@ void NDIReceiver::receive() {
     std::lock_guard<std::mutex> lock(mutex);
 
     switch (NDIlib_recv_capture_v2(ndi_receive, &video_frame, &audio_frame, &metadata_frame, 1000)) {
-            // Video data
+        // Video data
         case NDIlib_frame_type_video:
             video_frame.p_metadata = nullptr;
 
@@ -127,14 +130,16 @@ void NDIReceiver::receive() {
 
             tmp_result_array.resize(
                     {video_frame.yres, video_frame.xres, FourCC2NumBytesPerPixel.at(video_frame.FourCC)});
-//                    std::cout << result_array.shape(0) << "," << result_array.shape(1) << "," << result_array.shape(2)
-//                              << std::endl;
-//                    std::cout << video_frame.xres << "," << video_frame.yres << std::endl;
-//                    std::cout << result_array.size() / sizeof(unsigned char) << std::endl;
+//            std::cout << tmp_result_array.shape(0) << "," << tmp_result_array.shape(1) << ","
+//                      << tmp_result_array.shape(2)
+//                      << std::endl;
+//            std::cout << video_frame.xres << "," << video_frame.yres << ","
+//                      << FourCC2NumBytesPerPixel.at(video_frame.FourCC) << std::endl;
+//            std::cout << tmp_result_array.size() / sizeof(unsigned char) << std::endl;
 
-            std::cout << (int) (video_frame.FourCC == NDIlib_FourCC_type_BGRX)
-                      << (int) (video_frame.FourCC == NDIlib_FourCC_type_BGRA)
-                      << (int) (video_frame.FourCC == NDIlib_FourCC_type_UYVY) << std::endl;
+//            std::cout << (int) (video_frame.FourCC == NDIlib_FourCC_type_BGRX)
+//                      << (int) (video_frame.FourCC == NDIlib_FourCC_type_BGRA)
+//                      << (int) (video_frame.FourCC == NDIlib_FourCC_type_UYVY) << std::endl;
 
             if (video_frame.FourCC == NDIlib_FourCC_type_UYVY) {
                 Converter::convertUYVY2RGB((const unsigned char *) video_frame.p_data,
@@ -142,11 +147,11 @@ void NDIReceiver::receive() {
                                            video_frame.xres, video_frame.yres,
                                            video_frame.line_stride_in_bytes);
             } else if (video_frame.FourCC == NDIlib_FourCC_type_BGRA) {
-//                        std::cout << "RGBA" << std::endl;
-                memcpy((unsigned char *)tmp_result_array.mutable_data(), video_frame.p_data, tmp_result_array.size());
+//                std::cout << "RGBA" << std::endl;
+                memcpy((unsigned char *) tmp_result_array.mutable_data(), video_frame.p_data, tmp_result_array.size());
             } else if (video_frame.FourCC == NDIlib_FourCC_type_BGRX) {
                 // BGRの時のNDI video_frameからnumpy result_arrayへのデータのコピー
-//                        std::cout << "RGB" << std::endl;
+//                std::cout << "RGB" << std::endl;
                 auto frame = tmp_result_array.mutable_data();
                 for (int i = 0; i < video_frame.yres; ++i) {
                     for (int j = 0; j < video_frame.xres; ++j) {

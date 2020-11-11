@@ -2,6 +2,9 @@
 
 pySimpleNDI is a library that that makes it easy to use NDI in Python.
 
+## Install
+type `pip install pysimplendi`.
+
 ## Example
 
 ### NDISender

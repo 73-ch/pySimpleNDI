@@ -244,8 +244,6 @@ $RECYCLE.BIN/
 *.out
 *.app
 
-# Custom
+### Custom
 .idea
-
-# custom
 cmake-build-debug

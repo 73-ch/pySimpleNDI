@@ -93,8 +93,18 @@ bool NDIReceiver::setSource(const std::string &ndiName) {
     return false;
 }
 
-void NDIReceiver::addHandler() {
+void NDIReceiver::addHandler(const std::string& name, const std::function<void(void)>& callback) {
+    handlers.insert(std::make_pair(name, callback));
+}
 
+void NDIReceiver::removeHandler(const std::string& name) {
+    handlers.erase(name);
+}
+
+void NDIReceiver::callHandlers() const {
+    for (const auto& x : handlers) {
+        x.second();
+    }
 }
 
 py::array_t<unsigned char> NDIReceiver::getCurrentFrame() const {
@@ -165,6 +175,8 @@ void NDIReceiver::receive() {
             NDIlib_recv_free_video_v2(ndi_receive, &video_frame);
 
             std::swap(result_array, tmp_result_array);
+
+            callHandlers();
             break;
 
             // Audio data

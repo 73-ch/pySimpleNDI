@@ -9,6 +9,8 @@
 #include <Processing.NDI.Lib.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#include <pybind11/stl.h>
+#include <pybind11/functional.h>
 
 #include "Converter.h"
 
@@ -22,6 +24,7 @@ class NDIReceiver {
 
     py::array_t<unsigned char> result_array;
     py::array_t<unsigned char> tmp_result_array;
+    std::map<std::string, const std::function<void(void)>> handlers;
 
     bool receiving = false;
 
@@ -30,6 +33,7 @@ class NDIReceiver {
     void startReceive();
     void stopReceive();
     void receive();
+    void callHandlers() const;
 
 public:
     NDIlib_find_instance_t ndi_find;
@@ -40,7 +44,8 @@ public:
 
     std::vector<std::string> getSourceList();
     bool setSource(const std::string& ndiName);
-    void addHandler();
+    void addHandler(const std::string& name, const std::function<void(void)>& callback);
+    void removeHandler(const std::string& name);
     py::array_t<unsigned char> getCurrentFrame() const;
 
     const std::map<NDIlib_FourCC_video_type_e , int> FourCC2NumBytesPerPixel{

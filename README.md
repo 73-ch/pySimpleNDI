@@ -4,8 +4,6 @@ pySimpleNDI is a library that that makes it easy to use NDI in Python.
 
 ## Example
 
-### `examples/receive.py`
-
 ### NDISender
 
 NDISender can send np array([width, height, 3] or [width, height, 4])

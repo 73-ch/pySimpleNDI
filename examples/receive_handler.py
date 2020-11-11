@@ -2,8 +2,8 @@ import time
 from pysimplendi import NDIReceiver
 
 
-def handler():
-    print("hello")
+def handler(image):
+    print(image.shape)
 
 
 if __name__ == '__main__':

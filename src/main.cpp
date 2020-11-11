@@ -3,7 +3,6 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
-#include <pybind11/stl.h>
 
 namespace py = pybind11;
 
@@ -23,6 +22,6 @@ PYBIND11_MODULE(simplendi, m) {
         .def("getSourceList", (std::vector<std::string> (NDIReceiver::*)()) &NDIReceiver::getSourceList)
         .def("setSource", (bool (NDIReceiver::*)(const std::string)) &NDIReceiver::setSource)
         .def("getCurrentFrame", (py::array_t<unsigned char>(NDIReceiver::*)()) &NDIReceiver::getCurrentFrame)
-        .def("addHandler", (void (NDIReceiver::*)(const std::string& name, const std::function<void(void)> &f)) &NDIReceiver::addHandler)
+        .def("addHandler", (void (NDIReceiver::*)(const std::string& name, const std::function<void(py::array_t<unsigned char>)> &f)) &NDIReceiver::addHandler)
         .def("removeHandler", (void (NDIReceiver::*)(const std::string& name)) &NDIReceiver::removeHandler);
 }

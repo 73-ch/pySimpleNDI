@@ -24,7 +24,7 @@ class NDIReceiver {
 
     py::array_t<unsigned char> result_array;
     py::array_t<unsigned char> tmp_result_array;
-    std::map<std::string, const std::function<void(void)>> handlers;
+    std::map<std::string, const std::function<void(py::array_t<unsigned char>)>> handlers;
 
     bool receiving = false;
 
@@ -44,7 +44,7 @@ public:
 
     std::vector<std::string> getSourceList();
     bool setSource(const std::string& ndiName);
-    void addHandler(const std::string& name, const std::function<void(void)>& callback);
+    void addHandler(const std::string& name, const std::function<void(py::array_t<unsigned char>)>& callback);
     void removeHandler(const std::string& name);
     py::array_t<unsigned char> getCurrentFrame() const;
 

@@ -93,7 +93,7 @@ bool NDIReceiver::setSource(const std::string &ndiName) {
     return false;
 }
 
-void NDIReceiver::addHandler(const std::string& name, const std::function<void(void)>& callback) {
+void NDIReceiver::addHandler(const std::string& name, const std::function<void(py::array_t<unsigned char>)>& callback) {
     handlers.insert(std::make_pair(name, callback));
 }
 
@@ -102,8 +102,10 @@ void NDIReceiver::removeHandler(const std::string& name) {
 }
 
 void NDIReceiver::callHandlers() const {
+    auto cp_result = result_array;
+
     for (const auto& x : handlers) {
-        x.second();
+        x.second(cp_result);
     }
 }
 

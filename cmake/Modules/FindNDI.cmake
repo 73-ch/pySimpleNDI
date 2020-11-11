@@ -1,3 +1,6 @@
+# Copyright (c) 2019-2020 Naoto Kondo
+# from https://github.com/buresu/ndi-python/blob/master/cmake/Modules/FindNDI.cmake
+
 if(WIN32)
     if(DEFINED ENV{NDI_SDK_DIR})
         set(NDI_FOUND TRUE)

@@ -47,10 +47,10 @@ bool NDISender::checkShape(const std::vector<ssize_t> &shape) {
 
     if (shape[2] == 3) {
         ndi_frame.FourCC = NDIlib_FourCC_type_BGRX;
-        std::cout << "BGRX" << std::endl;
+//        std::cout << "BGRX" << std::endl;
     } else if (shape[2] == 4) {
         ndi_frame.FourCC = NDIlib_FourCC_type_BGRA;
-        std::cout << "BGRA" << std::endl;
+//        std::cout << "BGRA" << std::endl;
     } else {
         std::cerr << "NDISender:: source shape[2] must be 3 or 4." << std::endl;
         return false;

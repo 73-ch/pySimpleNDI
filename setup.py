@@ -62,8 +62,8 @@ class CMakeBuild(build_ext):
 
 setup(
     name='pysimplendi',
-    version='0.0.2',
-
+    version='0.1.0',
+    license='MIT',
     author='Kosaku Namikawa',
     author_email='cigarbox.nami@gmail.com',
 
@@ -71,6 +71,8 @@ setup(
     long_description='',
 
     packages=find_packages(exclude=('tests',)),
+
+    url='https://github.com/73-ch/pySimpleNDI',
 
     install_requires=[],
     ext_modules=[CMakeExtension('pysimplendi.simplendi')],

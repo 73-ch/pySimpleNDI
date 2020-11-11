@@ -1,20 +1,21 @@
 import cv2
-import numpy as np
 from pysimplendi import NDISender
 
 if __name__ == "__main__":
-    sender = NDISender("hello")
-    image = cv2.imread("examples/img/test-trans.png", cv2.IMREAD_UNCHANGED)
-    image2 = cv2.imread("examples/img/test.png")
+    sender = NDISender("pysimplendi")
+    # transparent image [width, height, 4]
+    transparent = cv2.imread("examples/img/test-trans.png", cv2.IMREAD_UNCHANGED)
+    # normal image [width, height, 3]
+    normal = cv2.imread("examples/img/test.png")
 
     i = 0
 
-    print(image2.shape)
     while True:
         i = (i + 1) % 30
         print(i)
         if i > 15:
-            sender.send(image)
+            # send transparent image
+            sender.send(transparent)
         else:
-            sender.send(image2)
-
+            # send image
+            sender.send(normal)

@@ -142,18 +142,9 @@ void NDIReceiver::receive() {
 
             tmp_result_array.resize(
                     {video_frame.yres, video_frame.xres, FourCC2NumBytesPerPixel.at(video_frame.FourCC)});
-//            std::cout << tmp_result_array.shape(0) << "," << tmp_result_array.shape(1) << ","
-//                      << tmp_result_array.shape(2)
-//                      << std::endl;
-//            std::cout << video_frame.xres << "," << video_frame.yres << ","
-//                      << FourCC2NumBytesPerPixel.at(video_frame.FourCC) << std::endl;
-//            std::cout << tmp_result_array.size() / sizeof(unsigned char) << std::endl;
-
-//            std::cout << (int) (video_frame.FourCC == NDIlib_FourCC_type_BGRX)
-//                      << (int) (video_frame.FourCC == NDIlib_FourCC_type_BGRA)
-//                      << (int) (video_frame.FourCC == NDIlib_FourCC_type_UYVY) << std::endl;
 
             if (video_frame.FourCC == NDIlib_FourCC_type_UYVY) {
+//                std::cout << "UYUV" << std::endl;
                 Converter::convertUYVY2RGB((const unsigned char *) video_frame.p_data,
                                            result_array.mutable_data(),
                                            video_frame.xres, video_frame.yres,

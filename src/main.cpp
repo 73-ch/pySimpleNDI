@@ -9,7 +9,7 @@ namespace py = pybind11;
 #include "NDISender.h"
 #include "NDIReceiver.h"
 
-PYBIND11_MODULE(simplendi, m) {
+PYBIND11_MODULE(pysimplendi, m) {
     m.doc() = "Python binding of NDI";
 
     py::class_<NDISender>(m, "NDISender")

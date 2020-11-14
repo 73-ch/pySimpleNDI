@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(simplendi)
+project(pysimplendi)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
@@ -12,10 +12,10 @@ find_package(NDI REQUIRED)
 file(GLOB INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 
-pybind11_add_module(simplendi MODULE ${SOURCES})
+pybind11_add_module(pysimplendi MODULE ${SOURCES})
 
-target_include_directories(simplendi PRIVATE ${NDI_INCLUDE_DIR})
-target_link_directories(simplendi PRIVATE ${NDI_LIBRARY_DIR})
-target_link_libraries(simplendi PRIVATE pybind11::module ${NDI_LIBS})
+target_include_directories(pysimplendi PRIVATE ${NDI_INCLUDE_DIR})
+target_link_directories(pysimplendi PRIVATE ${NDI_LIBRARY_DIR})
+target_link_libraries(pysimplendi PRIVATE pybind11::module ${NDI_LIBS})
 
 source_group("" FILES ${SOURCES} ${INCLUDES})

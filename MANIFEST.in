@@ -1,4 +1,6 @@
 include README.md LICENSE
-global-include CMakeLists.txt *.cmake
+include CmakeList.txt
+recursive-include cmake *.cmake
 recursive-include src *
 recursive-include pybind11/include *.h
+recursive-include libs *.h

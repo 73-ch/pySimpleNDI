@@ -41,7 +41,8 @@ void NDISender::setName(const std::string &name) {
 }
 
 bool NDISender::checkShape(const std::vector<ssize_t> &shape) {
-    if (ndi_frame.xres != shape[0] || ndi_frame.yres != shape[1]) {
+    if (ndi_frame.xres != shape[1] || ndi_frame.yres != shape[0]) {
+//        std::cout << "change resolution" << std::endl;
         changeResolution(shape[1], shape[0]);
     }
 

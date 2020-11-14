@@ -62,7 +62,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='pysimplendi',
-    version='0.1.0',
+    version='0.1.1',
     license='MIT',
     author='Kosaku Namikawa',
     author_email='cigarbox.nami@gmail.com',
@@ -74,7 +74,7 @@ setup(
 
     url='https://github.com/73-ch/pySimpleNDI',
 
-    install_requires=[],
+    install_requires=["setuptools", "wheel", "pybind11==2.6.0"],
     ext_modules=[CMakeExtension('pysimplendi.simplendi')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,

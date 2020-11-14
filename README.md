@@ -3,11 +3,18 @@
 pySimpleNDI is a library that that makes it easy to use NDI in Python.
 
 ## requirements
-- cmake
+#### Cmake
 https://cmake.org/download/
 
-- NDI SDK
-https://ndi.tv/sdk/
+### NDI SDK
+download from https://ndi.tv/sdk/
+#### MacOS & Windows
+only run installer.
+
+#### linux
+1. extract downloaded file.
+1. run `InstallNDISDK_v4_Linux.sh` in the extracted folder.
+1. create symlink to `/NDI SDK for Linux/libndi.so.4` in `/usr/lib`.
 
 ## Install
 type `pip install pysimplendi`.

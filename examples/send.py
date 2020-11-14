@@ -8,14 +8,8 @@ if __name__ == "__main__":
     # normal image [width, height, 3]
     normal = cv2.imread("examples/img/test.png")
 
-    i = 0
-
     while True:
-        i = (i + 1) % 30
-        print(i)
-        if i > 15:
-            # send transparent image
-            sender.send(transparent)
-        else:
-            # send image
-            sender.send(normal)
+        # send transparent image
+        sender.send(transparent)
+        # send image
+        # sender.send(normal)

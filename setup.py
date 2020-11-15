@@ -14,6 +14,7 @@ __version__ = "0.1.5"
 # add libndi location to library_dirs
 library_dirs = []
 libraries = []
+extra_link_args = []
 system = platform.system()
 
 if system == "Windows":
@@ -25,6 +26,7 @@ if system == "Windows":
         libraries.append("Processing.NDI.Lib.x86")
 elif system == "Darwin":
     library_dirs.append("/Library/NDI SDK for Apple/lib/x64")
+    extra_link_args.append("-Wl,-rpath,"+"/Library/NDI SDK for Apple/lib/x64")
     libraries.append("ndi")
 elif system == "Linux":
     library_dirs.append("/usr/lib")
@@ -38,6 +40,7 @@ ext_module = Pybind11Extension("pysimplendi",
                                library_dirs=library_dirs,
                                libraries=libraries,
                                define_macros=[('VERSION_INFO', __version__)],
+                               extra_link_args=extra_link_args
                                )
 
 

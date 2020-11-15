@@ -1,5 +1,6 @@
 import os
 import platform
+import pathlib
 
 from glob import glob
 from setuptools import setup
@@ -12,15 +13,22 @@ __version__ = "0.1.5"
 
 # add libndi location to library_dirs
 library_dirs = []
+libraries = []
 system = platform.system()
 
 if system == "Windows":
+    print(os.path.expandvars('$NDI_SDK_DIR'))
     if os.environ['NDI_SDK_DIR']:
-        library_dirs.append(os.environ['NDI_SDK_DIR'] + "/Lib/x64")
+        ndi_dir = pathlib.Path(os.environ['NDI_SDK_DIR'] + "/Lib/x86")
+        print(ndi_dir.as_posix())
+        library_dirs.append(ndi_dir.as_posix())
+        libraries.append("Processing.NDI.Lib.x86")
 elif system == "Darwin":
     library_dirs.append("/Library/NDI SDK for Apple/lib/x64")
+    libraries.append("ndi")
 elif system == "Linux":
     library_dirs.append("/usr/lib")
+    libraries.append("ndi")
 
 
 # define ext_module
@@ -28,7 +36,7 @@ ext_module = Pybind11Extension("pysimplendi",
                                sorted(glob("src/*.cpp")),
                                include_dirs=["libs/include"],
                                library_dirs=library_dirs,
-                               libraries=["ndi"],
+                               libraries=libraries,
                                define_macros=[('VERSION_INFO', __version__)],
                                )
 

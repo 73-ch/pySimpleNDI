@@ -11,10 +11,13 @@ download from https://ndi.tv/sdk/
 #### MacOS & Windows
 only run installer.
 
-#### linux
-1. extract downloaded file.
-1. run `InstallNDISDK_v4_Linux.sh` in the extracted folder.
-1. create symlink to `/NDI SDK for Linux/libndi.so.4` in `/usr/lib`.
+#### linux 
+1. Extract downloaded file.
+2. Run `InstallNDISDK_v4_Linux.sh` in the extracted folder.
+3. Create symlink to `/NDI SDK for Linux/lib/"sys type"/libndi.so`&`/NDI SDK for Linux/lib/"sys type"/libndi.so.4`&`/NDI SDK for Linux/lib/"sys type"/libndi.so.4.2.6` in `/usr/lib`.
+4. Create symlink to `/NDI SDK for Linux/lib/"sys type"/libndi.so` & `libndi.so.4` & `libndi.so.4.2.6` in `/usr/lib/"systype"-linux-gnu`/. (on raspbian `/usr/lib/arm-linux-gnueabihf`) (or use `ndi_for_linux.sh`)
+
+
 
 ## Install
 type `pip install pysimplendi`.

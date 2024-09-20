@@ -4,6 +4,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 
+using ssize_t = Py_ssize_t;
+
 namespace py = pybind11;
 
 class NDISender {
